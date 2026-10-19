@@ -1,0 +1,14 @@
+namespace SistemaEleicao.Console.Domain;
+
+public sealed class Candidato
+{
+    public Candidato(string nome, int numero)
+    {
+        Nome = nome;
+        Numero = numero;
+    }
+
+    public string Nome { get; }
+
+    public int Numero { get; }
+}
