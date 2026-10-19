@@ -11,4 +11,11 @@ public sealed class Candidato
     public string Nome { get; }
 
     public int Numero { get; }
+
+    public int TotalVotos { get; private set; }
+
+    internal void ReceberVoto()
+    {
+        TotalVotos++;
+    }
 }
