@@ -115,36 +115,29 @@ static void RegistrarVoto(EleicaoManager eleicao)
 
 static void ExibirApuracao(EleicaoManager eleicao)
 {
-    var candidatos = eleicao.ListarCandidatos()
-        .OrderByDescending(candidato => candidato.TotalVotos)
-        .ThenBy(candidato => candidato.Numero)
-        .ToArray();
+    var resultado = eleicao.Apurar();
 
     System.Console.WriteLine("--- Apuração ---");
 
-    foreach (var candidato in candidatos)
+    foreach (var candidato in resultado.Candidatos)
     {
         System.Console.WriteLine(
             $"{candidato.Numero} - {candidato.Nome}: {candidato.TotalVotos} voto(s)");
     }
 
-    System.Console.WriteLine($"Votos brancos: {eleicao.TotalVotosBrancos}");
-    System.Console.WriteLine($"Votos nulos: {eleicao.TotalVotosNulos}");
+    System.Console.WriteLine($"Votos brancos: {resultado.VotosBrancos}");
+    System.Console.WriteLine($"Votos nulos: {resultado.VotosNulos}");
+    System.Console.WriteLine($"Total de votos: {resultado.TotalVotos}");
 
-    var maiorQuantidadeVotos = candidatos.Select(candidato => candidato.TotalVotos).DefaultIfEmpty().Max();
-
-    if (maiorQuantidadeVotos == 0)
+    if (resultado.Vencedores.Count == 0)
     {
         System.Console.WriteLine("Ainda não há candidato vencedor.");
         return;
     }
 
-    var vencedores = candidatos
-        .Where(candidato => candidato.TotalVotos == maiorQuantidadeVotos)
-        .Select(candidato => candidato.Nome)
-        .ToArray();
+    var nomesVencedores = resultado.Vencedores.Select(candidato => candidato.Nome).ToArray();
 
-    System.Console.WriteLine(vencedores.Length == 1
-        ? $"Candidato vencedor: {vencedores[0]}"
-        : $"Empate entre: {string.Join(", ", vencedores)}");
+    System.Console.WriteLine(nomesVencedores.Length == 1
+        ? $"Candidato vencedor: {nomesVencedores[0]}"
+        : $"Empate entre: {string.Join(", ", nomesVencedores)}");
 }

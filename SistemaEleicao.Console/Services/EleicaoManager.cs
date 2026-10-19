@@ -64,9 +64,11 @@ public sealed class EleicaoManager
         return eleitor;
     }
 
-    public Eleitor? BuscarEleitor(string identificador)
+    public Eleitor? BuscarEleitor(string? identificador)
     {
-        return _eleitores.GetValueOrDefault(identificador.Trim());
+        return string.IsNullOrWhiteSpace(identificador)
+            ? null
+            : _eleitores.GetValueOrDefault(identificador.Trim());
     }
 
     public TipoVoto RegistrarVoto(string identificadorEleitor, int? numeroCandidato)
@@ -102,5 +104,30 @@ public sealed class EleicaoManager
 
         candidato.ReceberVoto();
         return TipoVoto.Nominal;
+    }
+
+    public ResultadoEleicao Apurar()
+    {
+        var candidatosOrdenados = _candidatos.Values
+            .OrderByDescending(candidato => candidato.TotalVotos)
+            .ThenBy(candidato => candidato.Numero)
+            .ToArray();
+
+        var maiorQuantidadeVotos = candidatosOrdenados
+            .Select(candidato => candidato.TotalVotos)
+            .DefaultIfEmpty()
+            .Max();
+
+        var vencedores = maiorQuantidadeVotos == 0
+            ? []
+            : candidatosOrdenados
+                .Where(candidato => candidato.TotalVotos == maiorQuantidadeVotos)
+                .ToArray();
+
+        return new ResultadoEleicao(
+            candidatosOrdenados,
+            TotalVotosBrancos,
+            TotalVotosNulos,
+            vencedores);
     }
 }
